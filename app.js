@@ -288,10 +288,22 @@ $('backupNote').addEventListener('click', e => { if (e.target.id === 'backupNow'
 $('obBudget').addEventListener('input', e => formatInput(e.target));
 $('obSave').addEventListener('click', () => finishOnboarding(true));
 $('obSkip').addEventListener('click', () => finishOnboarding(false));
+let clearTxArmed = false;
+$('clearTx').addEventListener('click', e => {
+  const b = e.currentTarget;
+  if (!clearTxArmed) { clearTxArmed = true; b.textContent = 'Yakin hapus transaksi?'; setTimeout(() => { clearTxArmed = false; b.textContent = 'Hapus semua transaksi'; }, 4000); return; }
+  localStorage.removeItem(KEYS.tx);
+  transactions = [];
+  render();
+  toast('Semua riwayat transaksi dihapus');
+  b.textContent = 'Hapus semua transaksi';
+  clearTxArmed = false;
+});
+
 let resetArmed = false;
 $('resetAll').addEventListener('click', e => {
   const b = e.currentTarget;
-  if (!resetArmed) { resetArmed = true; b.textContent = 'Yakin? Semua data terhapus'; setTimeout(() => { resetArmed = false; b.textContent = 'Hapus semua data'; }, 4000); return; }
+  if (!resetArmed) { resetArmed = true; b.textContent = 'Yakin reset total?'; setTimeout(() => { resetArmed = false; b.textContent = 'Reset total aplikasi'; }, 4000); return; }
   Object.values(KEYS).filter(k => k !== KEYS.theme).forEach(k => localStorage.removeItem(k));
   location.reload();
 });
