@@ -1,7 +1,7 @@
 /* DompetKita - logika aplikasi */
 'use strict';
 
-const KEYS = { tx: 'dompetkita_txs', budget: 'dompetkita_budget', theme: 'dompetkita_theme', name: 'dompetkita_name', ob: 'dompetkita_ob', backup: 'dompetkita_backup' };
+const KEYS = { tx: 'dompetkita_txs', budget: 'dompetkita_budget', theme: 'dompetkita_theme', name: 'dompetkita_name', ob: 'dompetkita_ob', backup: 'dompetkita_backup', install: 'dompetkita_install_dismissed' };
 const CATEGORIES = {
   expense: ['Makan & Minum', 'Kebutuhan Pokok', 'Tagihan', 'Transport & Bensin', 'Belanja', 'Hiburan & Lifestyle', 'Investasi / Tabungan', 'Lainnya'],
   income: ['Gaji / Uang Saku', 'Hasil Usaha / Jualan', 'Bonus & Freelance', 'Hadiah / Kiriman', 'Lainnya']
@@ -298,6 +298,47 @@ $('resetAll').addEventListener('click', e => {
 $('exportCsv').addEventListener('click', exportCsv);
 $('importBtn').addEventListener('click', () => $('importFile').click());
 $('importFile').addEventListener('change', e => { if (e.target.files[0]) importJson(e.target.files[0]); e.target.value = ''; });
+
+/* ---------- Kartu pasang aplikasi ---------- */
+const installCard = $('installCard');
+const installText = $('installText');
+const installBtn = $('installBtn');
+const isStandalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const installDismissed = () => load(KEYS.install, false) === true;
+let deferredPrompt = null;
+
+function showInstallCard(msg, showButton) {
+  installText.textContent = msg;
+  installBtn.hidden = !showButton;
+  installCard.hidden = false;
+}
+function hideInstallCard() { installCard.hidden = true; }
+
+// Android/Chrome: simpan event lalu tampilkan kartu dengan tombol pasang resmi
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!isStandalone && !installDismissed()) showInstallCard('Pasang ke layar utama agar bisa dibuka seperti aplikasi biasa.', true);
+});
+
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  const prompt = deferredPrompt;
+  deferredPrompt = null; // event hanya bisa dipakai sekali
+  prompt.prompt();
+  const { outcome } = await prompt.userChoice;
+  hideInstallCard();
+  if (outcome === 'dismissed') save(KEYS.install, true);
+});
+
+// iPhone/iPad: tidak ada API pasang, jadi kartu berupa panduan manual
+if (isIOS && !isStandalone && !installDismissed()) {
+  showInstallCard('Di iPhone, buka di Safari lalu ketuk ikon Bagikan, pilih "Tambah ke Layar Utama". Sebelum pindah, cadangkan datamu dulu lewat Data dan pengaturan.', false);
+}
+
+$('installDismiss').addEventListener('click', () => { hideInstallCard(); save(KEYS.install, true); });
+window.addEventListener('appinstalled', () => { hideInstallCard(); save(KEYS.install, true); });
 
 /* ---------- Mulai ---------- */
 $('presets').innerHTML = PRESETS.map((p, i) => `<button class="chip" data-i="${i}">${p.label}</button>`).join('');
