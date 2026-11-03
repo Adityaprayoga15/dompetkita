@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>DompetKita - Tahu ke mana uangmu pergi</title>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('dompetkita_theme')||'dark'}catch(e){}</script>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f5132">
+<link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><div class="logo">💳</div><div><h1>DompetKita</h1><p>Tahu ke mana uangmu pergi</p></div></div>
+  <div class="top-actions">
+    <button class="icon-btn" id="themeBtn" aria-label="Ganti tema">🌙</button>
+    <span class="pill" id="userPill">Halo!</span>
+  </div>
+</header>
+
+<main>
+  <div class="month-nav" id="monthNav">
+    <button class="icon-btn" id="prevMonth" aria-label="Bulan sebelumnya">◀</button>
+    <strong id="monthLabel"></strong>
+    <button class="icon-btn" id="nextMonth" aria-label="Bulan berikutnya">▶</button>
+  </div>
+
+  <section class="tab active" id="tabHome">
+    <div class="card onboard" id="onboard" hidden>
+      <h2>Selamat datang di DompetKita</h2>
+      <p class="hint">Atur dua hal ini dulu agar ringkasanmu akurat. Bisa diubah kapan saja.</p>
+      <div class="field"><label for="obName">Nama panggilan</label><input type="text" id="obName" maxlength="20" placeholder="Contoh: Aditya"></div>
+      <div class="field"><label for="obBudget">Batas pengeluaran per bulan (Rp)</label><input type="text" inputmode="numeric" id="obBudget" placeholder="Contoh: 1.500.000"></div>
+      <button class="btn-primary" id="obSave">Mulai mencatat</button>
+      <button class="btn-ghost" id="obSkip">Lewati dulu</button>
+    </div>
+    <div id="backupNote"></div>
+    <div id="banner"></div>
+    <div class="card hero">
+      <span class="hero-label">Sisa uang seluruhnya</span>
+      <div class="hero-amount" id="totalBalance">Rp 0</div>
+      <p class="hero-note" id="heroNote"></p>
+      <div class="budget">
+        <div class="budget-row"><span>Limit bulanan: <strong id="budgetValue"></strong></span><span id="budgetPercent">0%</span></div>
+        <div class="bar"><div class="bar-fill" id="budgetFill"></div></div>
+        <div class="budget-edit">
+          <input type="text" inputmode="numeric" id="budgetInput" placeholder="Ubah limit (Rp)" aria-label="Limit bulanan">
+          <button class="btn-small" id="saveBudget">Simpan limit</button>
+        </div>
+      </div>
+      <div class="flow">
+        <div><span>Pemasukan bulan ini</span><strong id="totalIncome">Rp 0</strong></div>
+        <div><span>Pengeluaran bulan ini</span><strong id="totalExpense">Rp 0</strong></div>
+      </div>
+    </div>
+    <div class="card"><h2>Kondisi bulan ini</h2><div id="insight" class="insight"></div></div>
+    <div class="card"><h2>Uangmu habis ke mana?</h2><div id="breakdown"></div></div>
+  </section>
+
+  <section class="tab" id="tabAdd">
+    <div class="card">
+      <h2 id="formTitle">Catat transaksi</h2>
+      <p class="hint">Pintasan cepat (isi kategori dan nominal otomatis):</p>
+      <div class="chips" id="presets"></div>
+      <div class="seg" role="group" aria-label="Tipe transaksi">
+        <button class="seg-btn active" data-type="expense" id="segExpense">Pengeluaran</button>
+        <button class="seg-btn" data-type="income" id="segIncome">Pemasukan</button>
+      </div>
+      <div class="field"><label for="txAmount">Nominal (Rp)</label><input type="text" inputmode="numeric" id="txAmount" placeholder="Contoh: 25.000" autocomplete="off"></div>
+      <div class="field"><label for="txCategory">Kategori</label><select id="txCategory"></select></div>
+      <div class="field"><label for="txDate">Tanggal</label><input type="date" id="txDate"></div>
+      <div class="field"><label for="txDesc">Catatan (opsional)</label><input type="text" id="txDesc" placeholder="Contoh: makan siang warteg" maxlength="80"></div>
+      <p class="error" id="formError" role="alert"></p>
+      <button class="btn-primary" id="saveTx">Simpan transaksi</button>
+      <button class="btn-ghost" id="cancelEdit" hidden>Batal ubah</button>
+    </div>
+  </section>
+
+  <section class="tab" id="tabHistory">
+    <div class="card">
+      <div class="row-between"><h2>Riwayat transaksi</h2><span class="hint" id="txCount">0 transaksi</span></div>
+      <input type="search" id="searchInput" placeholder="Cari catatan atau kategori" aria-label="Cari transaksi">
+      <ul class="tx-list" id="txList"></ul>
+    </div>
+    <div class="card">
+      <h2>Data dan pengaturan</h2>
+      <div class="field"><label for="nameInput">Nama kamu</label>
+        <div class="budget-edit"><input type="text" id="nameInput" placeholder="Nama panggilan" maxlength="20"><button class="btn-small solid" id="saveName">Simpan nama</button></div>
+      </div>
+      <p class="hint">Data hanya tersimpan di browser ini. Simpan cadangan secara berkala. Cadangan JSON berisi transaksi, nama, dan limit bulanan.</p>
+      <div class="chips">
+        <button class="btn-small solid" id="exportJson">Cadangkan (JSON)</button>
+        <button class="btn-small solid" id="exportCsv">Unduh CSV</button>
+        <button class="btn-small solid" id="importBtn">Pulihkan dari JSON</button>
+        <button class="btn-small solid danger" id="resetAll">Hapus semua data</button>
+        <input type="file" id="importFile" accept="application/json" hidden>
+      </div>
+    </div>
+  </section>
+</main>
+
+<nav class="bottom-nav">
+  <button class="nav-item active" data-tab="Home"><span>🏠</span>Beranda</button>
+  <button class="nav-item" data-tab="Add"><span>➕</span>Catat</button>
+  <button class="nav-item" data-tab="History"><span>📜</span>Riwayat</button>
+</nav>
+<div class="toast" id="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
