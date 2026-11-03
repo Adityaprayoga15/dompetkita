@@ -45,8 +45,10 @@ main{padding:8px 16px 16px}
 .bar{height:8px;background:rgba(0,0,0,.25);border-radius:4px;overflow:hidden}
 .bar-fill{height:100%;width:0;background:#4fcb8f;border-radius:4px;transition:width .4s ease,background .3s}
 .budget-edit{display:flex;gap:8px;margin-top:10px}
-.budget-edit input{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28);color:#fff;padding:8px 10px;font-size:.92rem}
-.budget-edit input::placeholder{color:rgba(255,255,255,.72)}
+.budget-edit input{background:var(--field);border:1px solid var(--line);color:var(--text);padding:8px 10px;font-size:.92rem;flex:1}
+.budget-edit input::placeholder{color:var(--muted)}
+.hero .budget-edit input{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28);color:#fff}
+.hero .budget-edit input::placeholder{color:rgba(255,255,255,.72)}
 .hero .btn-small{background:#5dd6a0;color:#06301f}
 .flow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .flow div{background:rgba(255,255,255,.1);border-radius:var(--r-md);padding:10px 12px}
