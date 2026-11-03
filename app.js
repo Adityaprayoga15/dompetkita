@@ -64,7 +64,7 @@ function switchTab(name) {
 }
 let toastTimer;
 function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200); }
-function setTheme(t) { document.documentElement.dataset.theme = t; $('themeBtn').textContent = t === 'dark' ? '🌙' : '☀️'; save(KEYS.theme, t); }
+function setTheme(t) { t = t === 'light' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; $('themeBtn').textContent = t === 'dark' ? '🌙' : '☀️'; save(KEYS.theme, t); }
 
 /* ---------- Bulan ---------- */
 function shiftMonth(d) {
